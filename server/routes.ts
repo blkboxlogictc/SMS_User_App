@@ -1,18 +1,18 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupDevAuth, isDevAuthenticated } from "./devAuth";
 import { insertBusinessSchema, insertEventSchema, insertPromotionSchema, insertCheckinSchema, insertEventRsvpSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
-  await setupAuth(app);
+  await setupDevAuth(app);
 
   // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+  app.get('/api/auth/user', isDevAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const user = await storage.getUser(userId);
       res.json(user);
     } catch (error) {
@@ -46,9 +46,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/businesses', isAuthenticated, async (req: any, res) => {
+  app.post('/api/businesses', isDevAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const user = await storage.getUser(userId);
       
       if (user?.role !== 'business') {
@@ -71,10 +71,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/businesses/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/businesses/:id', isDevAuthenticated, async (req: any, res) => {
     try {
       const id = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       const business = await storage.getBusiness(id);
       if (!business) {
@@ -108,9 +108,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/events', isAuthenticated, async (req: any, res) => {
+  app.post('/api/events', isDevAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const eventData = insertEventSchema.parse({
         ...req.body,
         organizerId: userId,
@@ -138,9 +138,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/promotions', isAuthenticated, async (req: any, res) => {
+  app.post('/api/promotions', isDevAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const user = await storage.getUser(userId);
       
       if (user?.role !== 'business') {
@@ -160,9 +160,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Check-in routes
-  app.get('/api/checkins', isAuthenticated, async (req: any, res) => {
+  app.get('/api/checkins', isDevAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const checkins = await storage.getCheckinsByUser(userId);
       res.json(checkins);
     } catch (error) {
@@ -171,9 +171,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/checkins', isAuthenticated, async (req: any, res) => {
+  app.post('/api/checkins', isDevAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const checkinData = insertCheckinSchema.parse({
         ...req.body,
         userId,
@@ -191,9 +191,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Event RSVP routes
-  app.get('/api/event-rsvps', isAuthenticated, async (req: any, res) => {
+  app.get('/api/event-rsvps', isDevAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const rsvps = await storage.getEventRsvpsByUser(userId);
       res.json(rsvps);
     } catch (error) {
@@ -202,9 +202,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/event-rsvps', isAuthenticated, async (req: any, res) => {
+  app.post('/api/event-rsvps', isDevAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const rsvpData = insertEventRsvpSchema.parse({
         ...req.body,
         userId,

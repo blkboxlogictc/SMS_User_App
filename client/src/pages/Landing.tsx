@@ -1,10 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin } from "lucide-react";
+import { MapPin, User, Building } from "lucide-react";
 
 export default function Landing() {
-  const handleLogin = () => {
+  const handleGeneralLogin = () => {
     window.location.href = "/api/login";
+  };
+
+  const handleBusinessLogin = () => {
+    window.location.href = "/api/login-business";
   };
 
   return (
@@ -23,18 +27,29 @@ export default function Landing() {
             Discover local businesses, events, and exclusive promotions in downtown Stuart, FL
           </p>
 
-          <Button 
-            onClick={handleLogin}
-            className="w-full sms-blue mb-4"
-          >
-            Get Started
-          </Button>
+          <div className="space-y-3 mb-4">
+            <Button 
+              onClick={handleGeneralLogin}
+              className="w-full sms-blue flex items-center justify-center"
+            >
+              <User size={20} className="mr-2" />
+              Continue as Visitor
+            </Button>
+            
+            <Button 
+              onClick={handleBusinessLogin}
+              variant="outline"
+              className="w-full border-[hsl(var(--sms-green))] text-[hsl(var(--sms-green))] hover:bg-[hsl(var(--sms-green))] hover:text-white flex items-center justify-center"
+            >
+              <Building size={20} className="mr-2" />
+              Business Owner Login
+            </Button>
+          </div>
 
-          <div className="bg-gray-50 rounded-lg p-4 text-sm">
-            <div className="font-medium text-gray-700 mb-2">Development Test Accounts:</div>
-            <div className="text-gray-600 space-y-1">
-              <div><strong>General User:</strong> user@test.com / password123</div>
-              <div><strong>Business Owner:</strong> owner@test.com / password123</div>
+          <div className="bg-gray-50 rounded-lg p-3 text-xs">
+            <div className="font-medium text-gray-700 mb-1">Development Mode</div>
+            <div className="text-gray-500">
+              Click either button above to test the app with sample accounts
             </div>
           </div>
         </CardContent>

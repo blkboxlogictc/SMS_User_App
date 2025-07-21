@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a full-stack web application for the Stuart Main Street community in downtown Stuart, FL. The app helps users discover local businesses, events, and exclusive promotions while providing business owners with tools to manage their presence and engage with customers.
+This is a full-stack web application for the Stuart Main Street community in downtown Stuart, FL. The app helps users discover local businesses, events, and exclusive promotions while providing business owners with tools to manage their presence and engage with customers. The app is now fully functional with a complete mobile-friendly interface, interactive map, user authentication system, and database backend.
 
 ## User Preferences
 

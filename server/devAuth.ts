@@ -1,18 +1,33 @@
 import type { Express, RequestHandler } from "express";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
+import MemoryStore from "memorystore";
 import { storage } from "./storage";
 
 // Development authentication system
 export function getDevSession() {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
-  const pgStore = connectPg(session);
-  const sessionStore = new pgStore({
-    conString: process.env.DATABASE_URL,
-    createTableIfMissing: true,
-    ttl: sessionTtl,
-    tableName: "sessions",
-  });
+  
+  let sessionStore;
+  
+  if (!process.env.DATABASE_URL || process.env.DATABASE_URL === '') {
+    // Use memory store for SQLite development
+    const MemStore = MemoryStore(session);
+    sessionStore = new MemStore({
+      checkPeriod: sessionTtl, // prune expired entries every 24h
+    });
+    console.log('Using memory store for sessions (SQLite development)');
+  } else {
+    // Use PostgreSQL store for production
+    const pgStore = connectPg(session);
+    sessionStore = new pgStore({
+      conString: process.env.DATABASE_URL,
+      createTableIfMissing: true,
+      ttl: sessionTtl,
+      tableName: "sessions",
+    });
+    console.log('Using PostgreSQL store for sessions');
+  }
   
   return session({
     secret: process.env.SESSION_SECRET || "dev-secret-key-for-testing",
@@ -31,7 +46,7 @@ export async function setupDevAuth(app: Express) {
   app.set("trust proxy", 1);
   app.use(getDevSession());
 
-  // Development login route that creates test users
+  // Development login route that creates test users (general patron)
   app.get("/api/login", async (req, res) => {
     // Create or get test user
     const testUser = await storage.upsertUser({
@@ -55,6 +70,7 @@ export async function setupDevAuth(app: Express) {
 
     res.redirect("/");
   });
+
 
   // Business owner login route
   app.get("/api/login-business", async (req, res) => {

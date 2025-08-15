@@ -1,6 +1,15 @@
+// Environment variables are loaded by tsx -r dotenv/config in npm script
+
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+
+// Debug environment variables
+console.log("=== Server Environment Debug ===");
+console.log("NODE_ENV:", process.env.NODE_ENV);
+console.log("DATABASE_URL:", process.env.DATABASE_URL ? "Set" : "Not set");
+console.log("SUPABASE_URL:", process.env.SUPABASE_URL ? "Set" : "Not set");
+console.log("================================");
 
 const app = express();
 app.use(express.json());

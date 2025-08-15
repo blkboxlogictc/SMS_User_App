@@ -2,12 +2,141 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
+    
+    <!-- Primary Meta Tags -->
+    <title>Stuart Main Street - Discover Downtown Stuart, FL</title>
+    <meta name="title" content="Stuart Main Street - Discover Downtown Stuart, FL" />
+    <meta name="description" content="Discover local businesses, events, and exclusive promotions in downtown Stuart, Florida. Your gateway to the vibrant Main Street community." />
+    <meta name="keywords" content="Stuart Florida, Main Street, local business, downtown Stuart, events, promotions, mobile app" />
+    <meta name="author" content="Stuart Main Street" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://stuartmainstreet.app/" />
+    <meta property="og:title" content="Stuart Main Street - Discover Downtown Stuart, FL" />
+    <meta property="og:description" content="Discover local businesses, events, and exclusive promotions in downtown Stuart, Florida." />
+    <meta property="og:image" content="/Sailfish-1.jpg" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://stuartmainstreet.app/" />
+    <meta property="twitter:title" content="Stuart Main Street - Discover Downtown Stuart, FL" />
+    <meta property="twitter:description" content="Discover local businesses, events, and exclusive promotions in downtown Stuart, Florida." />
+    <meta property="twitter:image" content="/Sailfish-1.jpg" />
+    
+    <!-- PWA Meta Tags -->
+    <meta name="application-name" content="Stuart Main Street" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Stuart Main Street" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="msapplication-config" content="/browserconfig.xml" />
+    <meta name="msapplication-TileColor" content="#3B82F6" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="theme-color" content="#3B82F6" />
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="167x167" href="/apple-touch-icon.png" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- Prevent zoom on input focus (iOS) -->
+    <style>
+      @media screen and (-webkit-min-device-pixel-ratio:0) {
+        select, textarea, input[type="text"], input[type="password"],
+        input[type="datetime"], input[type="datetime-local"],
+        input[type="date"], input[type="month"], input[type="time"],
+        input[type="week"], input[type="number"], input[type="email"],
+        input[type="url"], input[type="search"], input[type="tel"],
+        input[type="color"] {
+          font-size: 16px !important;
+        }
+      }
+      
+      /* Prevent pull-to-refresh */
+      body {
+        overscroll-behavior-y: contain;
+      }
+      
+      /* Loading screen */
+      #loading {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #3B82F6 0%, #10B981 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        color: white;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      }
+      
+      .loading-content {
+        text-align: center;
+      }
+      
+      .loading-icon {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 20px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        animation: pulse 2s infinite;
+      }
+      
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.1); opacity: 0.8; }
+      }
+    </style>
   </head>
   <body>
+    <!-- Loading screen -->
+    <div id="loading">
+      <div class="loading-content">
+        <div class="loading-icon">📍</div>
+        <h2>Stuart Main Street</h2>
+        <p>Loading your local experience...</p>
+      </div>
+    </div>
+    
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
-    <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
+    
+    <!-- Hide loading screen when app loads -->
+    <script>
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          const loading = document.getElementById('loading');
+          if (loading) {
+            loading.style.opacity = '0';
+            loading.style.transition = 'opacity 0.5s ease-out';
+            setTimeout(() => loading.remove(), 500);
+          }
+        }, 1000);
+      });
+    </script>
   </body>
 </html>

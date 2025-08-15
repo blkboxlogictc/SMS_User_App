@@ -1,23 +1,53 @@
-import {
+// Import schema based on database type
+import * as schemaPostgres from "@shared/schema";
+import * as schemaSqlite from "@shared/schema-sqlite";
+
+// Choose schema based on database type
+const schema = (!process.env.DATABASE_URL || process.env.DATABASE_URL === '')
+  ? schemaSqlite
+  : schemaPostgres;
+
+const {
   users,
   businesses,
   events,
   promotions,
   checkins,
   eventRsvps,
-  type User,
-  type UpsertUser,
-  type Business,
-  type InsertBusiness,
-  type Event,
-  type InsertEvent,
-  type Promotion,
-  type InsertPromotion,
-  type Checkin,
-  type InsertCheckin,
-  type EventRsvp,
-  type InsertEventRsvp,
+} = schema;
+
+// Import rewards, surveys, and surveyResponses from PostgreSQL schema specifically
+import {
+  rewards,
+  surveys,
+  surveyResponses,
+} from "@shared/schema-postgres";
+
+// Import types from the main schema
+import type {
+  User,
+  UpsertUser,
+  Business,
+  InsertBusiness,
+  Event,
+  InsertEvent,
+  Promotion,
+  InsertPromotion,
+  Checkin,
+  InsertCheckin,
+  EventRsvp,
+  InsertEventRsvp,
 } from "@shared/schema";
+
+// Import reward and survey types from PostgreSQL schema
+import type {
+  Reward,
+  InsertReward,
+  Survey,
+  InsertSurvey,
+  SurveyResponse,
+  InsertSurveyResponse,
+} from "@shared/schema-postgres";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
 
@@ -41,6 +71,7 @@ export interface IStorage {
   
   // Promotion operations
   getPromotions(): Promise<Promotion[]>;
+  getPromotion(id: number): Promise<Promotion | undefined>;
   getPromotionsByBusiness(businessId: number): Promise<Promotion[]>;
   createPromotion(promotion: InsertPromotion): Promise<Promotion>;
   updatePromotion(id: number, promotion: Partial<InsertPromotion>): Promise<Promotion>;
@@ -51,6 +82,7 @@ export interface IStorage {
   
   // Event RSVP operations
   getEventRsvpsByUser(userId: string): Promise<EventRsvp[]>;
+  getEventRsvpsByEvent(eventId: number): Promise<EventRsvp[]>;
   createEventRsvp(rsvp: InsertEventRsvp): Promise<EventRsvp>;
   
   // Stats operations
@@ -59,6 +91,21 @@ export interface IStorage {
     openBusinesses: number;
     upcomingEvents: number;
   }>;
+  
+  // Reward operations
+  getRewardsByUser(userId: string): Promise<Reward[]>;
+  getTotalRewardPoints(userId: string): Promise<number>;
+  createReward(reward: InsertReward): Promise<Reward>;
+  
+  // Survey operations
+  getActiveSurveys(): Promise<Survey[]>;
+  getSurvey(id: number): Promise<Survey | undefined>;
+  createSurvey(survey: InsertSurvey): Promise<Survey>;
+  
+  // Survey response operations
+  getSurveyResponsesByUser(userId: string): Promise<SurveyResponse[]>;
+  getSurveyResponseByUserAndSurvey(userId: string, surveyId: number): Promise<SurveyResponse | undefined>;
+  createSurveyResponse(response: InsertSurveyResponse): Promise<SurveyResponse>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -140,6 +187,11 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(promotions).where(eq(promotions.isActive, true)).orderBy(desc(promotions.createdAt));
   }
 
+  async getPromotion(id: number): Promise<Promotion | undefined> {
+    const [promotion] = await db.select().from(promotions).where(eq(promotions.id, id));
+    return promotion;
+  }
+
   async getPromotionsByBusiness(businessId: number): Promise<Promotion[]> {
     return await db
       .select()
@@ -177,6 +229,10 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(eventRsvps).where(eq(eventRsvps.userId, userId)).orderBy(desc(eventRsvps.createdAt));
   }
 
+  async getEventRsvpsByEvent(eventId: number): Promise<EventRsvp[]> {
+    return await db.select().from(eventRsvps).where(eq(eventRsvps.eventId, eventId)).orderBy(desc(eventRsvps.createdAt));
+  }
+
   async createEventRsvp(rsvp: InsertEventRsvp): Promise<EventRsvp> {
     const [newRsvp] = await db.insert(eventRsvps).values(rsvp).returning();
     return newRsvp;
@@ -197,6 +253,51 @@ export class DatabaseStorage implements IStorage {
       openBusinesses: openBusinesses.length,
       upcomingEvents: upcomingEvents.length,
     };
+  }
+
+  // Reward operations
+  async getRewardsByUser(userId: string): Promise<Reward[]> {
+    return await db.select().from(rewards).where(eq(rewards.userId, userId)).orderBy(desc(rewards.createdAt));
+  }
+
+  async getTotalRewardPoints(userId: string): Promise<number> {
+    const userRewards = await db.select().from(rewards).where(eq(rewards.userId, userId));
+    return userRewards.reduce((total: number, reward: Reward) => total + reward.points, 0);
+  }
+
+  async createReward(reward: InsertReward): Promise<Reward> {
+    const [newReward] = await db.insert(rewards).values(reward).returning();
+    return newReward;
+  }
+
+  // Survey operations
+  async getActiveSurveys(): Promise<Survey[]> {
+    return await db.select().from(surveys).where(eq(surveys.isActive, true)).orderBy(desc(surveys.createdAt));
+  }
+
+  async getSurvey(id: number): Promise<Survey | undefined> {
+    const [survey] = await db.select().from(surveys).where(eq(surveys.id, id));
+    return survey;
+  }
+
+  async createSurvey(survey: InsertSurvey): Promise<Survey> {
+    const [newSurvey] = await db.insert(surveys).values(survey).returning();
+    return newSurvey;
+  }
+
+  // Survey response operations
+  async getSurveyResponsesByUser(userId: string): Promise<SurveyResponse[]> {
+    return await db.select().from(surveyResponses).where(eq(surveyResponses.userId, userId)).orderBy(desc(surveyResponses.createdAt));
+  }
+
+  async getSurveyResponseByUserAndSurvey(userId: string, surveyId: number): Promise<SurveyResponse | undefined> {
+    const [response] = await db.select().from(surveyResponses).where(and(eq(surveyResponses.userId, userId), eq(surveyResponses.surveyId, surveyId)));
+    return response;
+  }
+
+  async createSurveyResponse(response: InsertSurveyResponse): Promise<SurveyResponse> {
+    const [newResponse] = await db.insert(surveyResponses).values(response).returning();
+    return newResponse;
   }
 }
 

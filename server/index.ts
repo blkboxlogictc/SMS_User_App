@@ -13,33 +13,24 @@ console.log("================================");
 
 const app = express();
 
-// CORS middleware for production
+// CORS middleware for production - MUST be first middleware
 app.use((req, res, next) => {
   const origin = req.headers.origin;
-  const allowedOrigins = [
-    'https://sms-user-app-ixnc.vercel.app',
-    'http://localhost:5173',
-    'http://localhost:3000'
-  ];
   
   // Debug logging
-  console.log('CORS Debug - Origin:', origin);
-  console.log('CORS Debug - Allowed origins:', allowedOrigins);
-  console.log('CORS Debug - Origin included:', origin && allowedOrigins.includes(origin));
+  console.log('CORS Debug - Method:', req.method, 'Path:', req.path, 'Origin:', origin);
   
-  // More permissive CORS for Vercel domains
-  if (origin && (allowedOrigins.includes(origin) || origin.includes('vercel.app'))) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-    console.log('CORS Debug - Setting Access-Control-Allow-Origin to:', origin);
-  }
-  
+  // Set CORS headers for ALL requests
+  res.setHeader('Access-Control-Allow-Origin', origin || '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   
+  console.log('CORS Debug - Headers set for origin:', origin);
+  
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
-    console.log('CORS Debug - Handling OPTIONS preflight request');
+    console.log('CORS Debug - Handling OPTIONS preflight request for:', req.path);
     res.status(200).end();
     return;
   }

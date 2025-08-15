@@ -10,6 +10,9 @@ build/
 .next/
 out/
 
+# Keep dist folder structure but ignore contents for development
+!dist/.gitkeep
+
 # Environment variables (ALL env files)
 .env*
 *.env

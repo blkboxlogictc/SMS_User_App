@@ -3,7 +3,7 @@ services:
     name: stuart-main-street-api
     env: node
     plan: starter
-    buildCommand: npm install && npm run build
+    buildCommand: npm install && npm run build:server
     startCommand: npm start
     envVars:
       - key: NODE_ENV

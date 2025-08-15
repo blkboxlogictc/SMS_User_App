@@ -22,16 +22,24 @@ app.use((req, res, next) => {
     'http://localhost:3000'
   ];
   
-  if (allowedOrigins.includes(origin)) {
+  // Debug logging
+  console.log('CORS Debug - Origin:', origin);
+  console.log('CORS Debug - Allowed origins:', allowedOrigins);
+  console.log('CORS Debug - Origin included:', origin && allowedOrigins.includes(origin));
+  
+  // More permissive CORS for Vercel domains
+  if (origin && (allowedOrigins.includes(origin) || origin.includes('vercel.app'))) {
     res.setHeader('Access-Control-Allow-Origin', origin);
+    console.log('CORS Debug - Setting Access-Control-Allow-Origin to:', origin);
   }
   
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
+    console.log('CORS Debug - Handling OPTIONS preflight request');
     res.status(200).end();
     return;
   }

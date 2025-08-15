@@ -81,7 +81,7 @@ export default function UserMenu() {
           <User size={20} className="text-gray-600" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-80">
+      <SheetContent side="right" className="w-80 bg-white">
         <SheetHeader>
           <SheetTitle className="flex items-center space-x-3">
             <UserCircle size={24} className="text-[hsl(var(--sms-blue))]" />
@@ -147,16 +147,6 @@ export default function UserMenu() {
               </div>
             </div>
           </div>
-
-          {/* Debug: Clear Invalid Session Button */}
-          <Button
-            variant="outline"
-            className="w-full justify-start text-orange-600 border-orange-200 hover:bg-orange-50 mb-2"
-            onClick={handleClearSession}
-          >
-            <LogOut size={16} className="mr-3" />
-            Clear Session (Debug)
-          </Button>
 
           {/* Logout Button */}
           <Button

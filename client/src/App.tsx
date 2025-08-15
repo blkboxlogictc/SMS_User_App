@@ -16,6 +16,9 @@ import Account from "@/pages/Account";
 import BusinessDirectory from "@/pages/BusinessDirectory";
 import SignOut from "@/pages/SignOut";
 
+// Get the API base URL from environment variables
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 function Router() {
   const { user, loading } = useAuth();
   const [showBusinessOnboarding, setShowBusinessOnboarding] = useState(false);
@@ -29,7 +32,7 @@ function Router() {
       // Check if user is a business owner without a business
       if (user.role === "business") {
         // Check if they have a business_id or business record
-        fetch("/api/businesses/owned")
+        fetch(`${API_BASE_URL}/api/businesses/owned`)
           .then((res) => res.json())
           .then((businesses) => {
             if (!businesses || businesses.length === 0) {

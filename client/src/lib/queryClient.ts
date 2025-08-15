@@ -1,6 +1,10 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 import { supabase } from "./supabase";
 
+// Get the API base URL from environment variables
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+console.log("DEBUG: API_BASE_URL configured as:", API_BASE_URL);
+
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
@@ -57,8 +61,10 @@ export async function apiRequest(
       console.warn("DEBUG: No access token found - proceeding without auth");
     }
 
-    console.log("DEBUG: Making fetch request to:", url);
-    const res = await fetch(url, {
+    // Ensure URL is absolute
+    const fullUrl = url.startsWith('http') ? url : `${API_BASE_URL}${url.startsWith('/') ? url : '/' + url}`;
+    console.log("DEBUG: Making fetch request to:", fullUrl);
+    const res = await fetch(fullUrl, {
       method,
       headers,
       body: data ? JSON.stringify(data) : undefined,
@@ -116,7 +122,12 @@ export const getQueryFn: <T>(options: {
       console.log("DEBUG: getQueryFn Authorization header added");
     }
     
-    const res = await fetch(queryKey.join("/") as string, {
+    // Build the full API URL
+    const apiPath = queryKey.join("/");
+    const fullUrl = apiPath.startsWith('http') ? apiPath : `${API_BASE_URL}${apiPath.startsWith('/') ? apiPath : '/' + apiPath}`;
+    console.log("DEBUG: getQueryFn making request to:", fullUrl);
+    
+    const res = await fetch(fullUrl, {
       credentials: "include",
       headers,
     });

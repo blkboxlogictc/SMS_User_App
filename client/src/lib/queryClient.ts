@@ -4,6 +4,11 @@ import { supabase } from "./supabase";
 // Get the API base URL from environment variables
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 console.log("DEBUG: API_BASE_URL configured as:", API_BASE_URL);
+console.log("DEBUG: Environment variables:", {
+  VITE_API_URL: import.meta.env.VITE_API_URL,
+  NODE_ENV: import.meta.env.NODE_ENV,
+  MODE: import.meta.env.MODE
+});
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {

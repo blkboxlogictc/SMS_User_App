@@ -27,13 +27,6 @@ export const supabase = createClient(supabaseUrl, supabaseServiceKey);
 export async function setupSupabaseAuth(app: Express) {
   // Middleware to verify Supabase JWT tokens
   const verifySupabaseToken: RequestHandler = async (req, res, next) => {
-    // Ensure CORS headers are set for ALL responses, including errors
-    const origin = req.headers.origin;
-    res.header('Access-Control-Allow-Origin', origin || '*');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    
     const authHeader = req.headers.authorization;
     
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -146,13 +139,6 @@ export async function setupSupabaseAuth(app: Express) {
 
 // Middleware function that can be used to protect individual routes
 export const requireSupabaseAuth: RequestHandler = async (req, res, next) => {
-  // Ensure CORS headers are set for ALL responses, including errors
-  const origin = req.headers.origin;
-  res.header('Access-Control-Allow-Origin', origin || '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  
   const authHeader = req.headers.authorization;
   
   if (!authHeader || !authHeader.startsWith('Bearer ')) {

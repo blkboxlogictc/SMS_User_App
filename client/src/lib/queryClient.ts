@@ -69,11 +69,15 @@ export async function apiRequest(
     // Ensure URL is absolute
     const fullUrl = url.startsWith('http') ? url : `${API_BASE_URL}${url.startsWith('/') ? url : '/' + url}`;
     console.log("DEBUG: Making fetch request to:", fullUrl);
+    console.log("DEBUG: Request headers:", headers);
+    console.log("DEBUG: Request method:", method);
+    
     const res = await fetch(fullUrl, {
       method,
       headers,
       body: data ? JSON.stringify(data) : undefined,
       credentials: "include",
+      mode: "cors", // Explicitly set CORS mode
     });
 
     console.log("DEBUG: Fetch response received:", res.status);
@@ -131,10 +135,12 @@ export const getQueryFn: <T>(options: {
     const apiPath = queryKey.join("/");
     const fullUrl = apiPath.startsWith('http') ? apiPath : `${API_BASE_URL}${apiPath.startsWith('/') ? apiPath : '/' + apiPath}`;
     console.log("DEBUG: getQueryFn making request to:", fullUrl);
+    console.log("DEBUG: getQueryFn headers:", headers);
     
     const res = await fetch(fullUrl, {
       credentials: "include",
       headers,
+      mode: "cors", // Explicitly set CORS mode
     });
 
     console.log("DEBUG: getQueryFn response status:", res.status);

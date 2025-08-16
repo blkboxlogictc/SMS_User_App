@@ -18,39 +18,41 @@ const app = express();
 console.log('=== CORS SETUP DEBUG ===');
 console.log('Setting up CORS middleware...');
 
-// Temporarily allow ALL origins for debugging
+// Simplified CORS configuration
 const corsOptions = {
-  origin: true, // Allow all origins temporarily
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // For production, allow specific origins
+    const allowedOrigins = [
+      'https://sms-user-app-ixnc.vercel.app',
+      'http://localhost:3000',
+      'http://localhost:5173',
+      'http://localhost:5000'
+    ];
+    
+    // Temporarily allow all origins for debugging
+    console.log('CORS: Checking origin:', origin);
+    callback(null, true); // Allow all origins temporarily
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  optionsSuccessStatus: 200 // Some legacy browsers choke on 204
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+  preflightContinue: false,
+  optionsSuccessStatus: 200
 };
 
 app.use(cors(corsOptions));
-console.log('CORS middleware applied with options:', corsOptions);
+console.log('CORS middleware applied');
 
-// Additional manual CORS headers as backup
+// Simple logging middleware for CORS debugging
 app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  console.log('=== MANUAL CORS BACKUP ===');
-  console.log('Request:', req.method, req.path);
-  console.log('Origin:', origin);
-  
-  // Set headers manually as backup
-  res.header('Access-Control-Allow-Origin', origin || '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  
-  console.log('Manual CORS headers set for origin:', origin);
-  
-  if (req.method === 'OPTIONS') {
-    console.log('Handling OPTIONS preflight request');
-    res.status(200).end();
-    return;
-  }
-  
+  console.log('=== REQUEST DEBUG ===');
+  console.log('Method:', req.method);
+  console.log('Path:', req.path);
+  console.log('Origin:', req.headers.origin);
+  console.log('Headers:', Object.keys(req.headers));
   next();
 });
 

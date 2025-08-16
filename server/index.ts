@@ -18,35 +18,42 @@ const app = express();
 console.log('=== CORS SETUP DEBUG ===');
 console.log('Setting up CORS middleware...');
 
-// Simplified CORS configuration
-const allowedOrigins = [
-  'https://sms-user-app-ixnc.vercel.app',
-  'http://localhost:3000',
-  'http://localhost:5173',
-  'http://localhost:5000'
-];
+// CORS configuration - Allow all origins temporarily to fix the issue
+console.log('Setting up CORS with permissive configuration...');
 
-const corsOptions = {
-  origin: allowedOrigins,
+app.use(cors({
+  origin: true, // Allow all origins
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
-  preflightContinue: false,
   optionsSuccessStatus: 200
-};
+}));
 
-app.use(cors(corsOptions));
-console.log('CORS middleware applied');
-
-// Simple logging middleware for CORS debugging
+// Additional manual CORS headers as backup
 app.use((req, res, next) => {
-  console.log('=== REQUEST DEBUG ===');
+  const origin = req.headers.origin;
+  console.log('=== CORS DEBUG ===');
   console.log('Method:', req.method);
   console.log('Path:', req.path);
-  console.log('Origin:', req.headers.origin);
-  console.log('Headers:', Object.keys(req.headers));
+  console.log('Origin:', origin);
+  
+  // Set CORS headers manually as backup
+  res.header('Access-Control-Allow-Origin', origin || '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
+  console.log('CORS headers set manually');
+  
+  if (req.method === 'OPTIONS') {
+    console.log('Handling OPTIONS preflight request');
+    return res.status(200).end();
+  }
+  
   next();
 });
+
+console.log('CORS middleware configured');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

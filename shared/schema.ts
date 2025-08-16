@@ -173,12 +173,11 @@ export const eventRsvpsRelations = relations(eventRsvps, ({ one }) => ({
   }),
 }));
 
-export const rewardItemsRelations = relations(rewardItems, ({ one, many }) => ({
+export const rewardItemsRelations = relations(rewardItems, ({ one }) => ({
   business: one(businesses, {
     fields: [rewardItems.businessId],
     references: [businesses.id],
   }),
-  redemptions: many(rewardRedemptions),
 }));
 
 // Insert schemas

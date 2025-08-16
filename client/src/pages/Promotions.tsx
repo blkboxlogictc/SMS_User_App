@@ -199,6 +199,7 @@ export default function Promotions() {
                                 <Textarea
                                   placeholder="Describe your promotion..."
                                   {...field}
+                                  value={field.value || ""}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -224,14 +225,15 @@ export default function Promotions() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  {businesses.map((business: any) => (
-                                    <SelectItem
-                                      key={business.id}
-                                      value={business.id.toString()}
-                                    >
-                                      {business.name}
-                                    </SelectItem>
-                                  ))}
+                                  {Array.isArray(businesses) &&
+                                    businesses.map((business: any) => (
+                                      <SelectItem
+                                        key={business.id}
+                                        value={business.id.toString()}
+                                      >
+                                        {business.name}
+                                      </SelectItem>
+                                    ))}
                                 </SelectContent>
                               </Select>
                               <FormMessage />
@@ -247,7 +249,11 @@ export default function Promotions() {
                               <FormItem>
                                 <FormLabel>Promo Code</FormLabel>
                                 <FormControl>
-                                  <Input placeholder="SAVE20" {...field} />
+                                  <Input
+                                    placeholder="SAVE20"
+                                    {...field}
+                                    value={field.value || ""}
+                                  />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -261,7 +267,11 @@ export default function Promotions() {
                               <FormItem>
                                 <FormLabel>Discount</FormLabel>
                                 <FormControl>
-                                  <Input placeholder="20%" {...field} />
+                                  <Input
+                                    placeholder="20%"
+                                    {...field}
+                                    value={field.value || ""}
+                                  />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>

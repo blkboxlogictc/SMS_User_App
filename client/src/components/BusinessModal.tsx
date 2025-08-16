@@ -107,7 +107,9 @@ export default function BusinessModal({
     return `Approximately ${waitTime} minutes`;
   };
 
-  const formatBusinessHours = (hours: string | Record<string, string>) => {
+  const formatBusinessHours = (
+    hours: string | Record<string, string> | null
+  ): string[] | null => {
     if (!hours) return null;
 
     let hoursObj: Record<string, string>;
@@ -117,7 +119,7 @@ export default function BusinessModal({
       try {
         hoursObj = JSON.parse(hours);
       } catch {
-        return hours; // Return as-is if parsing fails
+        return [hours]; // Return as array if parsing fails
       }
     } else {
       hoursObj = hours;
@@ -181,7 +183,9 @@ export default function BusinessModal({
 
           {/* Category & Status */}
           <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-500">{business.category}</span>
+            <span className="text-sm text-gray-500">
+              {business.category as string}
+            </span>
             <div className="flex items-center space-x-2">
               <div
                 className={`w-2 h-2 rounded-full ${
@@ -212,11 +216,11 @@ export default function BusinessModal({
               <div>
                 <div className="text-sm font-medium text-gray-900">Hours</div>
                 <div className="text-sm text-gray-600">
-                  {formatBusinessHours(business.hours)?.map(
-                    (dayHours: string, index: number) => (
-                      <div key={index}>{dayHours}</div>
-                    )
-                  )}
+                  {formatBusinessHours(
+                    business.hours as string | Record<string, string> | null
+                  )?.map((dayHours: string, index: number) => (
+                    <div key={index}>{dayHours}</div>
+                  ))}
                 </div>
               </div>
             </div>

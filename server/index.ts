@@ -19,23 +19,15 @@ console.log('=== CORS SETUP DEBUG ===');
 console.log('Setting up CORS middleware...');
 
 // Simplified CORS configuration
+const allowedOrigins = [
+  'https://sms-user-app-ixnc.vercel.app',
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'http://localhost:5000'
+];
+
 const corsOptions = {
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    // For production, allow specific origins
-    const allowedOrigins = [
-      'https://sms-user-app-ixnc.vercel.app',
-      'http://localhost:3000',
-      'http://localhost:5173',
-      'http://localhost:5000'
-    ];
-    
-    // Temporarily allow all origins for debugging
-    console.log('CORS: Checking origin:', origin);
-    callback(null, true); // Allow all origins temporarily
-  },
+  origin: allowedOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],

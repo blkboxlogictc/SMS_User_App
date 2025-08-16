@@ -1,6 +1,22 @@
-import type { Express, RequestHandler } from "express";
+import type { Express, RequestHandler, Request } from "express";
 import { createClient } from '@supabase/supabase-js';
 import { storage } from "./storage";
+
+// Extend Express Request type to include user
+declare global {
+  namespace Express {
+    interface Request {
+      user?: {
+        id: string;
+        email: string;
+        firstName: string;
+        lastName: string;
+        profileImageUrl: string;
+        role: string;
+      };
+    }
+  }
+}
 
 const supabaseUrl = process.env.SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY!;
@@ -11,13 +27,22 @@ export const supabase = createClient(supabaseUrl, supabaseServiceKey);
 export async function setupSupabaseAuth(app: Express) {
   // Middleware to verify Supabase JWT tokens
   const verifySupabaseToken: RequestHandler = async (req, res, next) => {
+    // Ensure CORS headers are set for ALL responses, including errors
+    const origin = req.headers.origin;
+    res.header('Access-Control-Allow-Origin', origin || '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    
     const authHeader = req.headers.authorization;
     
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.log('AUTH DEBUG: No authorization header found');
       return res.status(401).json({ message: "Unauthorized" });
     }
 
     const token = authHeader.substring(7);
+    console.log('AUTH DEBUG: Verifying token for origin:', origin);
 
     try {
       const { data: { user }, error } = await supabase.auth.getUser(token);
@@ -121,13 +146,22 @@ export async function setupSupabaseAuth(app: Express) {
 
 // Middleware function that can be used to protect individual routes
 export const requireSupabaseAuth: RequestHandler = async (req, res, next) => {
+  // Ensure CORS headers are set for ALL responses, including errors
+  const origin = req.headers.origin;
+  res.header('Access-Control-Allow-Origin', origin || '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
   const authHeader = req.headers.authorization;
   
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    console.log('REQUIRE AUTH DEBUG: No authorization header found for origin:', origin);
     return res.status(401).json({ message: "Unauthorized" });
   }
 
   const token = authHeader.substring(7);
+  console.log('REQUIRE AUTH DEBUG: Verifying token for origin:', origin);
 
   try {
     const { data: { user }, error } = await supabase.auth.getUser(token);
